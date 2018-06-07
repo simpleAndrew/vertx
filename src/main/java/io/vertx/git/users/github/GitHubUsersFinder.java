@@ -27,25 +27,32 @@ public class GitHubUsersFinder {
     @SneakyThrows
     public Single<List<User>> findUsers(@NonNull String userName, String language) {
         log.debug("Search for users with login:{} and language:{}", userName, language);
-        return githubClient.searchByNameAndLanguage(userName, language)
-                .switchIfEmpty(doFallBackSearch(userName))
-                .onErrorResumeNext(t -> tryToFallback(t, userName))
-                .flatMap(this::retrieveUser)
-                .toList()
+
+        Observable<JsonObject> searchObservable = language != null
+                ? findWithLanguage(userName, language)
+                : findWithoutLanguage(userName);
+
+        return searchObservable.flatMap(this::retrieveUser).toList()
                 .doOnNext(users -> log.debug("Found {} users for username:{}, language:{}", users.size(), userName, language))
                 .toSingle();
     }
 
-    private Observable<JsonObject> tryToFallback(Throwable exception, String userName) {
+    private Observable<JsonObject> findWithLanguage(@NonNull String userName, String language) {
+        return githubClient.searchByNameAndLanguage(userName, language)
+                .onErrorResumeNext(t -> treatTimeoutAsEmpty(t, userName))
+                .switchIfEmpty(findWithoutLanguage(userName));
+    }
+
+    private Observable<JsonObject> treatTimeoutAsEmpty(Throwable exception, String userName) {
         if (TimeoutException.class.isInstance(exception)) {
-            log.info("Falling back to because of request timeout");
-            return doFallBackSearch(userName);
+            log.info("Request timed out - treating it as empty");
+            return Observable.empty();
         }
         return Observable.error(exception);
     }
 
-    private Observable<JsonObject> doFallBackSearch(@NonNull String userName) {
-        log.info("Falling back on search by ony username: {}", userName);
+    private Observable<JsonObject> findWithoutLanguage(@NonNull String userName) {
+        log.debug("Search for users by ony username: {}", userName);
         return githubClient.searchByNameAndLanguage(userName, null);
     }
 
