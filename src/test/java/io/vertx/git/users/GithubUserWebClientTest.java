@@ -2,6 +2,7 @@ package io.vertx.git.users;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.git.users.github.GithubUserWebClient;
 import io.vertx.rxjava.core.buffer.Buffer;
 import io.vertx.rxjava.ext.web.client.HttpRequest;
 import io.vertx.rxjava.ext.web.client.HttpResponse;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class GithubUserClientTest {
+public class GithubUserWebClientTest {
 
     @Mock
     private WebClient client;
@@ -38,7 +39,7 @@ public class GithubUserClientTest {
     private HttpRequest<Buffer> request;
 
     @InjectMocks
-    private GithubUserClient searchClient;
+    private GithubUserWebClient searchClient;
 
     @Before
     public void mockClientBehaviour() {

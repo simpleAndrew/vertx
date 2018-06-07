@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" strict="true">
+
+    <Appenders>
+        <Appender type="Console" name="STDOUT">
+            <Layout type="PatternLayout" pattern="%highlight{%d %p %C{1}} %m %ex%n"/>
+        </Appender>
+    </Appenders>
+
+    <Loggers>
+        <Root level="WARN">
+            <AppenderRef ref="STDOUT"/>
+        </Root>
+        <Logger name="io.vertx.git.users" level="DEBUG">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+    </Loggers>
+
+</Configuration>
