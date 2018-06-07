@@ -1,4 +1,4 @@
-package io.vertx.git.users;
+package io.vertx.git.users.github;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -7,6 +7,7 @@ import io.vertx.rxjava.ext.web.client.WebClient;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
 import rx.Single;
 
@@ -17,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+@Slf4j
 @RequiredArgsConstructor
-public class GithubUserClient {
+public class GithubUserWebClient {
 
     private static final String SEARCH_API_URL = "http://api.github.com/search/users";
 
@@ -64,6 +65,7 @@ public class GithubUserClient {
         String finalQuery = userQuery + Optional.ofNullable(language)
                 .map(lang -> "+language:" + lang)
                 .orElse("");
+        log.debug("Github user search query q={}", finalQuery);
         return URLDecoder.decode(finalQuery, "UTF-8");
     }
 }

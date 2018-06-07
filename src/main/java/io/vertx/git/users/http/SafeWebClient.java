@@ -7,11 +7,13 @@ import io.vertx.rxjava.ext.web.client.HttpResponse;
 import io.vertx.rxjava.ext.web.client.WebClient;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import rx.Single;
 
 import javax.xml.ws.http.HTTPException;
 import java.net.URL;
 
+@Slf4j
 @RequiredArgsConstructor
 public class SafeWebClient {
 
@@ -30,15 +32,11 @@ public class SafeWebClient {
     }
 
     public Single<JsonObject> get(@NonNull String paramName, @NonNull String paramValue) {
-        HttpRequest<Buffer> request = buildGetRequest()
-                .addQueryParam(paramName, paramValue);
-        return doSafeRequest(request);
-
+        return doSafeRequest(buildGetRequest().addQueryParam(paramName, paramValue));
     }
 
     private HttpRequest<Buffer> buildGetRequest() {
-        return client.get(url.getHost(), url.getPath())
-                .timeout(timeoutMillis);
+        return client.get(url.getHost(), url.getPath()).timeout(timeoutMillis);
     }
 
     private Single<JsonObject> doSafeRequest(HttpRequest<Buffer> request) {
@@ -51,6 +49,7 @@ public class SafeWebClient {
         if (resp.statusCode() == 200) {
             return Single.just(resp);
         }
+        log.warn("Returning error for response with status code: {}. Body: {}", resp.statusCode(), resp.bodyAsString());
         return Single.error(new HTTPException(resp.statusCode()));
     }
 
