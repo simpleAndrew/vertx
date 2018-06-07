@@ -49,8 +49,7 @@ public class RestVerticle extends AbstractVerticle {
                 );
     }
 
-    private String convertToJson(List<User> json) {
+    private static String convertToJson(List<User> json) {
         return Json.encode(json);
     }
-
 }
