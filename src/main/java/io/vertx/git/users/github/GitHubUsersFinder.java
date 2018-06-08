@@ -39,11 +39,11 @@ public class GitHubUsersFinder {
 
     private Observable<JsonObject> findWithLanguage(@NonNull String userName, String language) {
         return githubClient.searchByNameAndLanguage(userName, language)
-                .onErrorResumeNext(t -> treatTimeoutAsEmpty(t, userName))
+                .onErrorResumeNext(this::treatTimeoutAsEmpty)
                 .switchIfEmpty(findWithoutLanguage(userName));
     }
 
-    private Observable<JsonObject> treatTimeoutAsEmpty(Throwable exception, String userName) {
+    private Observable<JsonObject> treatTimeoutAsEmpty(Throwable exception) {
         if (TimeoutException.class.isInstance(exception)) {
             log.info("Request timed out - treating it as empty");
             return Observable.empty();
