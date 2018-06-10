@@ -8,15 +8,15 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
-import rx.Single;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
 public class GitHubUsersFinder {
+
+    private static final String PROFILE_URL_FIELD = "url";
 
     private final GithubUserWebClient githubClient;
 
@@ -25,16 +25,14 @@ public class GitHubUsersFinder {
     }
 
     @SneakyThrows
-    public Single<List<User>> findUsers(@NonNull String userName, String language) {
+    public Observable<User> findUsers(@NonNull String userName, String language) {
         log.debug("Search for users with login:{} and language:{}", userName, language);
 
         Observable<JsonObject> searchObservable = language != null
                 ? findWithLanguage(userName, language)
                 : findWithoutLanguage(userName);
 
-        return searchObservable.flatMap(this::retrieveUser).toList()
-                .doOnNext(users -> log.debug("Found {} users for username:{}, language:{}", users.size(), userName, language))
-                .toSingle();
+        return searchObservable.flatMap(this::getUserFromProfile);
     }
 
     private Observable<JsonObject> findWithLanguage(@NonNull String userName, String language) {
@@ -52,12 +50,12 @@ public class GitHubUsersFinder {
     }
 
     private Observable<JsonObject> findWithoutLanguage(@NonNull String userName) {
-        log.debug("Search for users by ony username: {}", userName);
-        return githubClient.searchByNameAndLanguage(userName, null);
+        return githubClient.searchByNameAndLanguage(userName, null)
+                .doOnSubscribe(() -> log.debug("Search users by username only: {}", userName));
     }
 
-    private Observable<User> retrieveUser(JsonObject userSearchResult) {
-        return buildUrl(userSearchResult.getString("url"))
+    private Observable<User> getUserFromProfile(JsonObject userSearchResult) {
+        return buildUrl(userSearchResult.getString(PROFILE_URL_FIELD))
                 .doOnNext(url -> log.debug("Requesting user information by profile URL:{}", url))
                 .flatMapSingle(githubClient::getByProfile)
                 .map(json -> json.mapTo(User.class));

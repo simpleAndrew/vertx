@@ -3,7 +3,7 @@
 
     <Appenders>
         <Appender type="Console" name="STDOUT">
-            <Layout type="PatternLayout" pattern="%highlight{%d %p %C{1}} %m %ex%n"/>
+            <Layout type="PatternLayout" pattern="%highlight{%d %t %p %C{1}} %m %ex%n"/>
         </Appender>
     </Appenders>
 

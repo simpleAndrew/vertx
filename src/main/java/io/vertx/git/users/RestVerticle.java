@@ -32,9 +32,8 @@ public class RestVerticle extends AbstractVerticle {
         WebClient webClient = WebClient.create(vertx);
         gitSearchService = new GitHubUsersFinder(webClient);
 
-        Route route = router.get(SEARCH_PATH).produces("application/json");
-        route.handler(ResponseContentTypeHandler.create())
-                .handler(this::handleRequest);
+        Route searchRoute = router.get(SEARCH_PATH).produces("application/json");
+        searchRoute.handler(ResponseContentTypeHandler.create()).handler(this::handleRequest);
 
         httpServer.requestHandler(router::accept).listen(8080);
     }
@@ -42,7 +41,7 @@ public class RestVerticle extends AbstractVerticle {
     private void handleRequest(RoutingContext context) {
         String user = context.request().getParam(USER_PARAM);
         String language = context.request().getParam(LANGUAGE_PARAM);
-        gitSearchService.findUsers(user, language)
+        gitSearchService.findUsers(user, language).toList().toSingle()
                 .subscribe(
                         json -> context.response().end(convertToJson(json)),
                         throwable -> context.response().setStatusCode(DEFAULT_STATUS_CODE).end()

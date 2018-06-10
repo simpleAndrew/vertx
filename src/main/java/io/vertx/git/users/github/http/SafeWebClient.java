@@ -1,4 +1,4 @@
-package io.vertx.git.users.http;
+package io.vertx.git.users.github.http;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.buffer.Buffer;
@@ -17,7 +17,7 @@ import java.net.URL;
 @RequiredArgsConstructor
 public class SafeWebClient {
 
-    private static final int DEFAULT_TIMEOUT_MILLIS = 1000;
+    private static final int DEFAULT_TIMEOUT_MILLIS = 5000;
 
     private final WebClient client;
     private final URL url;
@@ -47,6 +47,7 @@ public class SafeWebClient {
 
     private Single<HttpResponse<Buffer>> leaveOnlySuccess(HttpResponse<Buffer> resp) {
         if (resp.statusCode() == 200) {
+            log.debug("Response successful. Body: {}", resp.bodyAsString());
             return Single.just(resp);
         }
         log.warn("Returning error for response with status code: {}. Body: {}", resp.statusCode(), resp.bodyAsString());

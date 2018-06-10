@@ -2,7 +2,7 @@ package io.vertx.git.users.github;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.git.users.http.SafeWebClient;
+import io.vertx.git.users.github.http.SafeWebClient;
 import io.vertx.rxjava.ext.web.client.WebClient;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +39,9 @@ public class GithubUserWebClient {
     private final WebClient client;
 
     public Observable<JsonObject> searchByNameAndLanguage(@NonNull String username, String language) {
+        String query = buildQuery(username, language);
         return new SafeWebClient(client, gitHubUrl)
-                .get(QUERY_PARAM, buildQuery(username, language))
+                .get(QUERY_PARAM, query)
                 .map(json -> json.getJsonArray("items"))
                 .toObservable()
                 .map(this::convertIntoJsons)
@@ -65,7 +66,7 @@ public class GithubUserWebClient {
         String finalQuery = userQuery + Optional.ofNullable(language)
                 .map(lang -> "+language:" + lang)
                 .orElse("");
-        log.debug("Github user search query q={}", finalQuery);
+        log.debug("Query: {}", finalQuery);
         return URLDecoder.decode(finalQuery, "UTF-8");
     }
 }
