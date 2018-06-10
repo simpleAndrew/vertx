@@ -1,15 +1,15 @@
-#Simple Git user search app
+# Simple Git user search app
 
 Small implementation to use git search api for users.
 Allows to search by username and language.
 
 Uses unauthorised API, so API call restrictions may apply.
 
-#Pre run setup
+# Pre run setup
 
 Make sure you have docker with logged user (will be needed to download base image) 
 
-#How to build the docker image 
+# How to build the docker image 
 
 Execute command
 
@@ -23,7 +23,7 @@ As a result you'll have an image generated.
 Application image is called *vertx/git-users-api*.
 
 
-#Quick run
+# Quick run
 
 Execute command
 ```
@@ -31,7 +31,7 @@ mvnw docker:start
 ```
 It will start application on port 8080.
 
-#How to use
+# How to use
 
 Application starts application with HTTP server that listens for GET requests on URI "/search" with params "user" and "language" on port 8080.
 
@@ -53,7 +53,7 @@ Result of search looks like:
 
 Note: application uses unauthorised Github API, which has some request limits (typically - 10 search requests per minute and 60 other request per 2 hours per IP)
  
-#Examples
+# Examples
 To find me
 ```
 curl localhost:8080/serch?user=simpleAndrew
