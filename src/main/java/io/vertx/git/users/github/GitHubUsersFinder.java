@@ -25,7 +25,11 @@ public class GitHubUsersFinder {
     }
 
     @SneakyThrows
-    public Observable<User> findUsers(@NonNull String userName, String language) {
+    public Observable<User> findUsers(String userName, String language) {
+        if(userName == null || userName.isEmpty()) {
+            return Observable.error(new IllegalArgumentException("userName should be provided"));
+        }
+
         log.debug("Search for users with login:{} and language:{}", userName, language);
 
         Observable<JsonObject> searchObservable = language != null
